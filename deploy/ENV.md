@@ -1,5 +1,5 @@
 # Env notes for local vs shared-host Railway deploy.
-# Full click-ops: docs/deploy-railway.md (later todo).
+# Full click-ops: docs/deploy-railway.md
 
 # --- Local (Compose + host processes) ---
 # VITE_API_URL=http://localhost:8000
@@ -9,6 +9,7 @@
 # WEBAUTHN_ORIGINS=http://localhost:5173,http://localhost:5174
 # COOKIE_SECURE=false
 # COOKIE_DOMAIN=
+# ENABLE_DEV_OAUTH_CLIENTS=true
 
 # --- Railway single HOST (e.g. https://xxx.up.railway.app) ---
 # Build args: VITE_API_URL=  (empty = same-origin)  VITE_BASE=/demo/ (Dockerfile)

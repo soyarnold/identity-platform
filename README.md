@@ -51,6 +51,7 @@ Re-run seed anytime (idempotent): `./scripts/seed.sh`
 | Audience | Start here |
 |----------|------------|
 | Running this monorepo | This README (quick start above) |
+| **Deploy to Railway** (portfolio / shared host) | [`docs/deploy-railway.md`](docs/deploy-railway.md) |
 | **Third-party app** integrating as an OAuth client (no repo access) | [`docs/oauth-clients.md`](docs/oauth-clients.md) |
 | API details | [`apps/api/README.md`](apps/api/README.md) |
 | Demo client | [`apps/demo/README.md`](apps/demo/README.md) |
