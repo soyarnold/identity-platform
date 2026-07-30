@@ -416,7 +416,8 @@ async def create_dev_client(
 #    cookie set via /auth/*). SPA then navigates to /oauth/consent with params.
 #
 # 4) User approves on consent UI → SPA POST /oauth/consent (cookie auth) →
-#    API returns JSON { redirect_to: "http://localhost:5174/callback?code=...&state=..." }
+#    API returns JSON { redirect_to:
+#      "http://localhost:5174/callback?code=...&state=..." }
 #    SPA performs location redirect to that URL.
 #
 # 5) Client app callback exchanges the code (server-side or public PKCE):
@@ -430,5 +431,6 @@ async def create_dev_client(
 #          Authorization: Bearer <access_token>
 #    → { sub, email, ... }
 #
-# Deny path: consent with approve=false → redirect_to callback?error=access_denied&state=...
+# Deny path: consent with approve=false →
+#   redirect_to callback?error=access_denied&state=...
 # ---------------------------------------------------------------------------
