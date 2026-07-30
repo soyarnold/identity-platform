@@ -4,6 +4,7 @@ from collections.abc import AsyncGenerator
 import pytest
 from httpx import ASGITransport, AsyncClient
 from redis.asyncio import Redis
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from identity_api.config import get_settings
@@ -12,18 +13,38 @@ from identity_api.main import create_app
 from identity_api.models import Base
 from identity_api.redis_client import get_redis
 
-# Force settings from env for tests
+# Use a dedicated DB so pytest drop_all does not wipe the migrate/dev schema.
+# Redis DB index 1 keeps test keys off the default app DB (0).
 os.environ.setdefault(
     "DATABASE_URL",
-    "postgresql+asyncpg://identity:identity@localhost:5432/identity",
+    "postgresql+asyncpg://identity:identity@localhost:5432/identity_test",
 )
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/1")
 os.environ.setdefault("SECRET_KEY", "test-secret")
 get_settings.cache_clear()
 
 
+async def _ensure_test_database() -> None:
+    """Create identity_test if missing (local Compose). Safe no-op if it exists."""
+    admin_url = os.environ.get(
+        "DATABASE_ADMIN_URL",
+        "postgresql+asyncpg://identity:identity@localhost:5432/postgres",
+    )
+    eng = create_async_engine(admin_url, isolation_level="AUTOCOMMIT")
+    try:
+        async with eng.connect() as conn:
+            exists = await conn.scalar(
+                text("SELECT 1 FROM pg_database WHERE datname = 'identity_test'")
+            )
+            if not exists:
+                await conn.execute(text("CREATE DATABASE identity_test"))
+    finally:
+        await eng.dispose()
+
+
 @pytest.fixture
 async def engine():
+    await _ensure_test_database()
     settings = get_settings()
     eng = create_async_engine(settings.database_url, echo=False)
     async with eng.begin() as conn:

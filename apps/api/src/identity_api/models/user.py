@@ -11,6 +11,7 @@ from identity_api.models.base import Base
 
 if TYPE_CHECKING:
     from identity_api.models.session import UserSession
+    from identity_api.models.webauthn_credential import WebAuthnCredential
 
 
 class User(Base):
@@ -30,3 +31,4 @@ class User(Base):
     )
 
     sessions: Mapped[list[UserSession]] = relationship(back_populates="user")
+    credentials: Mapped[list[WebAuthnCredential]] = relationship(back_populates="user")
