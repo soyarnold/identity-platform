@@ -71,6 +71,16 @@ npm run dev
 
 Open http://localhost:5174 — **Sign in with Identity Platform** (needs API + web running).
 
+### AWS CDK scaffold (phase 09)
+
+```bash
+cd infra
+npm install
+npx cdk synth   # synthesizes empty placeholder stacks
+```
+
+See [`infra/README.md`](infra/README.md) — VPC / RDS / ElastiCache / ECS / CloudFront stubs only. **Not deployable yet**; local Compose remains the runtime.
+
 ## API surface (summary)
 
 - Auth: `POST /auth/register|login|logout`, `GET /auth/me`
