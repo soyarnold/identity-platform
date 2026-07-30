@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from identity_api.config import settings
 from identity_api.redis_client import close_redis
-from identity_api.routers import auth, health, me, oauth, passkeys, webauthn
+from identity_api.routers import admin, auth, health, me, oauth, passkeys, webauthn
 
 
 @asynccontextmanager
@@ -38,6 +38,7 @@ def create_app() -> FastAPI:
     app.include_router(passkeys.router)
     app.include_router(webauthn.router)
     app.include_router(oauth.router)
+    app.include_router(admin.router)
     return app
 
 
