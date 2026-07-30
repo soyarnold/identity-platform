@@ -7,6 +7,9 @@ import { OverviewPage } from "./pages/OverviewPage";
 import { PasskeysPage } from "./pages/PasskeysPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { SessionsPage } from "./pages/SessionsPage";
+import { OAuthConsentPage } from "./pages/oauth/OAuthConsentPage";
+import { OAuthLoginPage } from "./pages/oauth/OAuthLoginPage";
+import { OAuthRegisterPage } from "./pages/oauth/OAuthRegisterPage";
 
 export default function App() {
   return (
@@ -16,6 +19,10 @@ export default function App() {
           <Route element={<AppShell />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            {/* Hosted OAuth UI — params preserved from GET /oauth/authorize */}
+            <Route path="/oauth/login" element={<OAuthLoginPage />} />
+            <Route path="/oauth/register" element={<OAuthRegisterPage />} />
+            <Route path="/oauth/consent" element={<OAuthConsentPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<OverviewPage />} />
               <Route path="/passkeys" element={<PasskeysPage />} />
