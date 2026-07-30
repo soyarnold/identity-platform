@@ -34,3 +34,5 @@ Auth endpoints: `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, 
 WebAuthn: `POST /webauthn/register/options|verify`, `POST /webauthn/login/options|verify`, `GET/PATCH/DELETE /me/passkeys`.
 
 OAuth (AS): `GET /oauth/authorize`, `POST /oauth/consent`, `POST /oauth/token`, `GET /oauth/userinfo`, `GET /.well-known/oauth-authorization-server`. Dev helper: `POST /oauth/dev/clients`.
+
+Admin (requires `is_admin`): `GET/PATCH /admin/users`, `GET /admin/audit-logs`, `GET/POST/PATCH/DELETE /admin/oauth/clients`.

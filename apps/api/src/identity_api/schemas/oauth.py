@@ -31,7 +31,7 @@ class UserInfoResponse(BaseModel):
 
 
 class OAuthClientCreate(BaseModel):
-    """Dev/test helper until admin CRUD lands in phase 07."""
+    """Create an OAuth client (admin API; also used by /oauth/dev/clients helper)."""
 
     name: str = Field(min_length=1, max_length=255)
     client_id: str = Field(min_length=3, max_length=64)

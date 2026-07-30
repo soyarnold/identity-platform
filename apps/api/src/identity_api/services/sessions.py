@@ -107,3 +107,15 @@ async def list_user_sessions(
         .order_by(UserSession.created_at.desc())
     )
     return list(result.scalars().all())
+
+
+async def revoke_all_user_sessions(
+    db: AsyncSession,
+    redis: Redis,
+    user_id: UUID,
+) -> int:
+    # Used when an admin disables a user so existing sid cookies stop working.
+    sessions = await list_user_sessions(db, user_id)
+    for session in sessions:
+        await revoke_session(db, redis, session)
+    return len(sessions)

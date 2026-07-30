@@ -355,8 +355,8 @@ async def create_dev_client(
     body: OAuthClientCreate,
     db: AsyncSession = Depends(get_db),
 ) -> OAuthClientOut:
-    # Temporary helper for local/manual testing until admin client CRUD (phase 07).
-    # Registers a public or confidential OAuth client with allowed redirect_uris.
+    # Unauthenticated local helper — prefer POST /admin/oauth/clients as admin.
+    # Kept for curl scripts without promoting an admin first.
     existing = await oauth_service.get_client(db, body.client_id)
     if existing is not None:
         raise HTTPException(

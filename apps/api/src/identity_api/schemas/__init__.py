@@ -1,3 +1,11 @@
+from identity_api.schemas.admin import (
+    AdminUserUpdate,
+    AuditLogListOut,
+    AuditLogOut,
+    OAuthClientListOut,
+    OAuthClientUpdate,
+    UserListOut,
+)
 from identity_api.schemas.auth import LoginRequest, RegisterRequest, UserOut
 from identity_api.schemas.common import MessageOut
 from identity_api.schemas.oauth import (
@@ -21,6 +29,9 @@ from identity_api.schemas.webauthn import (
 )
 
 __all__ = [
+    "AdminUserUpdate",
+    "AuditLogListOut",
+    "AuditLogOut",
     "ConsentRequest",
     "ConsentResponse",
     "LoginOptionsOut",
@@ -29,7 +40,9 @@ __all__ = [
     "LoginVerifyRequest",
     "MessageOut",
     "OAuthClientCreate",
+    "OAuthClientListOut",
     "OAuthClientOut",
+    "OAuthClientUpdate",
     "PasskeyOut",
     "PasskeyRenameRequest",
     "RegisterOptionsOut",
@@ -38,6 +51,7 @@ __all__ = [
     "SessionOut",
     "TokenResponse",
     "UserInfoResponse",
+    "UserListOut",
     "UserOut",
     "WebAuthnCredentialResponse",
 ]

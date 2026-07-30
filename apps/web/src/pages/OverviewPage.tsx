@@ -31,6 +31,11 @@ export function OverviewPage() {
         <Link className="button secondary" to="/sessions">
           View sessions
         </Link>
+        {user?.is_admin ? (
+          <Link className="button secondary" to="/admin/users">
+            Admin panel
+          </Link>
+        ) : null}
       </div>
     </section>
   );

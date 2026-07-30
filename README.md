@@ -42,12 +42,27 @@ Open http://localhost:5173 — register/login, passkeys, sessions (API on `:8000
 - After sign-in/register → `/oauth/consent` (same authorize query preserved)
 - Allow/Deny → `POST /oauth/consent` → browser navigates to `redirect_to`
 
+### Admin panel (phase 07)
+
+Promote a user (Postgres), then open http://localhost:5173/admin after signing in:
+
+```sql
+UPDATE users SET is_admin = true WHERE email = 'you@example.com';
+```
+
+- `/admin/users` — list, disable/enable, grant/revoke admin
+- `/admin/audit` — audit log viewer
+- `/admin/clients` — OAuth client CRUD
+
+API: `GET/PATCH /admin/users`, `GET /admin/audit-logs`, `GET/POST/PATCH/DELETE /admin/oauth/clients`.
+
 ## API surface (summary)
 
 - Auth: `POST /auth/register|login|logout`, `GET /auth/me`
 - Sessions: `GET /me/sessions`, `POST /me/sessions/{id}/revoke`
 - WebAuthn: `POST /webauthn/register|login/options|verify`, `GET/PATCH/DELETE /me/passkeys`
 - OAuth AS: authorize/consent/token/userinfo + PKCE; `POST /oauth/dev/clients` for local testing
+- Admin: users, audit logs, OAuth clients (`/admin/*`, requires `is_admin`)
 - CI: `.github/workflows/ci.yml` (ruff + pytest)
 
 ## Tooling

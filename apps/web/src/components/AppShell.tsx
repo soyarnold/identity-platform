@@ -17,6 +17,13 @@ export function AppShell() {
             </NavLink>
             <NavLink to="/passkeys">Passkeys</NavLink>
             <NavLink to="/sessions">Sessions</NavLink>
+            {user.is_admin ? (
+              <>
+                <NavLink to="/admin/users">Users</NavLink>
+                <NavLink to="/admin/audit">Audit</NavLink>
+                <NavLink to="/admin/clients">Clients</NavLink>
+              </>
+            ) : null}
             <button type="button" className="linkish" onClick={() => void logout()}>
               Sign out
             </button>
