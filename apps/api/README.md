@@ -18,8 +18,11 @@ pip install -e ".[dev]"
 docker compose up -d
 cd apps/api
 alembic upgrade head
+python -m identity_api.seed
 uvicorn identity_api.main:app --reload --port 8000
 ```
+
+Seed creates the admin user and `demo-app` OAuth client (idempotent; see `.env` `SEED_*` / `DEMO_*`).
 
 ## Lint / format / test
 
@@ -36,3 +39,5 @@ WebAuthn: `POST /webauthn/register/options|verify`, `POST /webauthn/login/option
 OAuth (AS): `GET /oauth/authorize`, `POST /oauth/consent`, `POST /oauth/token`, `GET /oauth/userinfo`, `GET /.well-known/oauth-authorization-server`. Dev helper: `POST /oauth/dev/clients`.
 
 Admin (requires `is_admin`): `GET/PATCH /admin/users`, `GET /admin/audit-logs`, `GET/POST/PATCH/DELETE /admin/oauth/clients`.
+
+Third-party OAuth client integration (no repo required): see `/docs/oauth-clients.md` at the monorepo root.

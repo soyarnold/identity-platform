@@ -1,13 +1,18 @@
 # Identity Platform
 
-Passwordless-capable identity provider (email/password + WebAuthn) with sessions, an OAuth 2.0 + PKCE authorization server, auth dashboard, admin panel, and a demo third-party app.
+Clerk/Auth0-style identity provider: email/password + WebAuthn, sessions, OAuth 2.0 + PKCE authorization server, auth dashboard, admin panel, and a demo third-party client.
 
 ## Stack
 
-- **API**: FastAPI, PostgreSQL, Redis (`apps/api`)
-- **Web**: Vite + React — dashboard, admin, hosted OAuth UI (`apps/web`)
-- **Demo**: Vite + React OAuth client (`apps/demo`)
-- **Infra**: AWS CDK scaffold (`infra`) — local Docker Compose for Postgres/Redis
+| Piece | Location |
+|-------|----------|
+| API (FastAPI) | `apps/api` |
+| Dashboard + hosted OAuth UI | `apps/web` (`:5173`) |
+| Demo OAuth client (Fieldkit) | `apps/demo` (`:5174`) |
+| Postgres + Redis (local) | `docker-compose.yml` |
+| AWS CDK scaffold | `infra/` (not deployable yet) |
+
+**Ports:** API `8000`, web `5173`, demo `5174`, Postgres `5432`, Redis `6379`.
 
 ## Quick start (local)
 
@@ -19,78 +24,62 @@ cd apps/api
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 alembic upgrade head
+python -m identity_api.seed    # admin + demo-app client
 uvicorn identity_api.main:app --reload --port 8000
 ```
 
-API health: http://localhost:8000/health
-
-### Auth dashboard (phase 05)
+In other terminals:
 
 ```bash
-cd apps/web
-npm install
-npm run dev
+cd apps/web && npm install && npm run dev     # http://localhost:5173
+cd apps/demo && npm install && npm run dev    # http://localhost:5174
 ```
 
-Open http://localhost:5173 — register/login, passkeys, sessions (API on `:8000`).
+**Seed defaults** (from `.env`):
 
-### Hosted OAuth UI (phase 06)
+| | |
+|--|--|
+| Admin | `admin@example.com` / `AdminPassword123!` |
+| OAuth client | `demo-app` → `http://localhost:5174/callback` |
 
-`GET /oauth/authorize` redirects the browser to:
+Sign in at the dashboard with the admin user, or open Fieldkit and use **Sign in with Identity Platform**.
 
-- `/oauth/login` (no session) or `/oauth/consent` (session present)
-- After sign-in/register → `/oauth/consent` (same authorize query preserved)
-- Allow/Deny → `POST /oauth/consent` → browser navigates to `redirect_to`
+Re-run seed anytime (idempotent): `./scripts/seed.sh`
 
-### Admin panel (phase 07)
+## Docs by audience
 
-Promote a user (Postgres), then open http://localhost:5173/admin after signing in:
+| Audience | Start here |
+|----------|------------|
+| Running this monorepo | This README (quick start above) |
+| **Third-party app** integrating as an OAuth client (no repo access) | [`docs/oauth-clients.md`](docs/oauth-clients.md) |
+| API details | [`apps/api/README.md`](apps/api/README.md) |
+| Demo client | [`apps/demo/README.md`](apps/demo/README.md) |
+| Future AWS layout | [`infra/README.md`](infra/README.md) |
 
-```sql
-UPDATE users SET is_admin = true WHERE email = 'you@example.com';
-```
+### Product surfaces (after seed)
 
-- `/admin/users` — list, disable/enable, grant/revoke admin
-- `/admin/audit` — audit log viewer
-- `/admin/clients` — OAuth client CRUD
-
-API: `GET/PATCH /admin/users`, `GET /admin/audit-logs`, `GET/POST/PATCH/DELETE /admin/oauth/clients`.
-
-### Demo OAuth client (phase 08)
-
-```bash
-# Register client once (or use admin → Clients)
-curl -sS -X POST http://localhost:8000/oauth/dev/clients \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Fieldkit Demo","client_id":"demo-app","redirect_uris":["http://localhost:5174/callback"],"is_confidential":false}'
-
-cd apps/demo
-npm install
-npm run dev
-```
-
-Open http://localhost:5174 — **Sign in with Identity Platform** (needs API + web running).
-
-### AWS CDK scaffold (phase 09)
-
-```bash
-cd infra
-npm install
-npx cdk synth   # synthesizes empty placeholder stacks
-```
-
-See [`infra/README.md`](infra/README.md) — VPC / RDS / ElastiCache / ECS / CloudFront stubs only. **Not deployable yet**; local Compose remains the runtime.
+- **Dashboard** (`:5173`) — register/login, passkeys, sessions; admin nav if `is_admin`
+- **Hosted OAuth** — `/oauth/login`, `/oauth/register`, `/oauth/consent` (linked from `GET /oauth/authorize`)
+- **Admin** — `/admin/users`, `/admin/audit`, `/admin/clients`
+- **Fieldkit** (`:5174`) — public PKCE client against this AS
 
 ## API surface (summary)
 
 - Auth: `POST /auth/register|login|logout`, `GET /auth/me`
 - Sessions: `GET /me/sessions`, `POST /me/sessions/{id}/revoke`
-- WebAuthn: `POST /webauthn/register|login/options|verify`, `GET/PATCH/DELETE /me/passkeys`
-- OAuth AS: authorize/consent/token/userinfo + PKCE; `POST /oauth/dev/clients` for local testing
-- Admin: users, audit logs, OAuth clients (`/admin/*`, requires `is_admin`)
-- CI: `.github/workflows/ci.yml` (ruff + pytest)
+- WebAuthn: `POST /webauthn/register|login/options|verify`, passkey CRUD under `/me/passkeys`
+- OAuth AS: authorize / consent / token / userinfo + PKCE; discovery at `/.well-known/oauth-authorization-server`
+- Admin: `/admin/users`, `/admin/audit-logs`, `/admin/oauth/clients` (requires `is_admin`)
+- Dev helper: `POST /oauth/dev/clients` (unauthenticated; prefer admin or seed locally)
+
+## CI / PRs
+
+- GitHub Actions (`.github/workflows/ci.yml`): Ruff + pytest with Postgres/Redis services
+- Feature work: one branch at a time from `main`; open a PR to merge (no auto-deploy)
+- CDK is scaffold-only — no deploy workflow yet
 
 ## Tooling
 
-- **Ruff** — lint and format (`apps/api`)
-- **pytest** — API tests under `apps/api/tests`
+- **Ruff** + **pytest** — `apps/api`
+- Manual OAuth curls — `scripts/manual-phase04-oauth-curl.sh`
+- Seed — `scripts/seed.sh` / `python -m identity_api.seed`
