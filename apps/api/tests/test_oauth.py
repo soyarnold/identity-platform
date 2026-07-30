@@ -183,3 +183,25 @@ async def test_discovery(client: AsyncClient) -> None:
     response = await client.get("/.well-known/oauth-authorization-server")
     assert response.status_code == 200
     assert response.json()["authorization_endpoint"].endswith("/oauth/authorize")
+
+
+@pytest.mark.asyncio
+async def test_dev_clients_disabled(client: AsyncClient, monkeypatch) -> None:
+    from identity_api.config import get_settings
+
+    monkeypatch.setenv("ENABLE_DEV_OAUTH_CLIENTS", "false")
+    get_settings.cache_clear()
+    try:
+        res = await client.post(
+            "/oauth/dev/clients",
+            json={
+                "name": "Nope",
+                "client_id": "should-404",
+                "redirect_uris": ["http://localhost:5174/callback"],
+                "is_confidential": False,
+            },
+        )
+        assert res.status_code == 404
+    finally:
+        monkeypatch.delenv("ENABLE_DEV_OAUTH_CLIENTS", raising=False)
+        get_settings.cache_clear()

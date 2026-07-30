@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     webauthn_origins: str = "http://localhost:5173,http://localhost:5174"
     cookie_secure: bool = False
     cookie_name: str = "sid"
+    # Unauthenticated POST /oauth/dev/clients — on for local/tests; off in production.
+    enable_dev_oauth_clients: bool = True
 
     # Local seed (python -m identity_api.seed) — not used by the API at runtime
     seed_admin_email: str = "admin@example.com"

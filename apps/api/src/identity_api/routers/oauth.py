@@ -16,7 +16,7 @@ from fastapi.responses import RedirectResponse
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from identity_api.config import settings
+from identity_api.config import get_settings, settings
 from identity_api.db import get_db
 from identity_api.deps import AuthContext, client_ip, get_current_auth
 from identity_api.models import OAuthClient
@@ -355,8 +355,13 @@ async def create_dev_client(
     body: OAuthClientCreate,
     db: AsyncSession = Depends(get_db),
 ) -> OAuthClientOut:
-    # Unauthenticated local helper — prefer POST /admin/oauth/clients as admin.
-    # Kept for curl scripts without promoting an admin first.
+    # Unauthenticated local helper — prefer seed or POST /admin/oauth/clients.
+    # Disabled in production via ENABLE_DEV_OAUTH_CLIENTS=false.
+    if not get_settings().enable_dev_oauth_clients:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Not found",
+        )
     existing = await oauth_service.get_client(db, body.client_id)
     if existing is not None:
         raise HTTPException(

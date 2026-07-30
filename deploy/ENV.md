@@ -20,4 +20,5 @@
 #   WEBAUTHN_ORIGINS=https://HOST
 #   COOKIE_SECURE=true
 #   COOKIE_DOMAIN=               # leave empty (host-only sid cookie)
+#   ENABLE_DEV_OAUTH_CLIENTS=false
 #   SECRET_KEY=<strong random>

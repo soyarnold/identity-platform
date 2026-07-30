@@ -70,7 +70,7 @@ Re-run seed anytime (idempotent): `./scripts/seed.sh`
 - WebAuthn: `POST /webauthn/register|login/options|verify`, passkey CRUD under `/me/passkeys`
 - OAuth AS: authorize / consent / token / userinfo + PKCE; discovery at `/.well-known/oauth-authorization-server`
 - Admin: `/admin/users`, `/admin/audit-logs`, `/admin/oauth/clients` (requires `is_admin`)
-- Dev helper: `POST /oauth/dev/clients` (unauthenticated; prefer admin or seed locally)
+- Dev helper: `POST /oauth/dev/clients` (local only when `ENABLE_DEV_OAUTH_CLIENTS=true`; prefer admin or seed)
 
 ## CI / PRs
 
