@@ -28,9 +28,9 @@ ARG VITE_DEMO_REDIRECT_URI=
 ARG VITE_DEMO_CLIENT_ID=demo-app
 ENV VITE_API_URL=$VITE_API_URL \
     VITE_DEMO_REDIRECT_URI=$VITE_DEMO_REDIRECT_URI \
-    VITE_DEMO_CLIENT_ID=$VITE_DEMO_CLIENT_ID
-# Asset base /demo/; React Router basename lands in the next todo
-RUN npm run build -- --base=/demo/
+    VITE_DEMO_CLIENT_ID=$VITE_DEMO_CLIENT_ID \
+    VITE_BASE=/demo/
+RUN npm run build
 
 # ---------------------------------------------------------------------------
 # Python API deps

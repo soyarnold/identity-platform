@@ -71,9 +71,9 @@ export function HomePage() {
         </button>
       </div>
       <p className="hint">
-        Needs API on :8000, hosted UI on :5173, and OAuth client{" "}
-        <code>{config.clientId}</code> with redirect{" "}
-        <code>{config.redirectUri}</code>. Create it via admin Clients or{" "}
+        Needs API + hosted Identity UI (local :8000 / :5173, or same host in
+        production) and OAuth client <code>{config.clientId}</code> with redirect{" "}
+        <code>{config.redirectUri}</code>. Create via seed, admin Clients, or{" "}
         <code>POST /oauth/dev/clients</code>.{" "}
         <Link to="/callback">Callback</Link> handles the code exchange.
       </p>
