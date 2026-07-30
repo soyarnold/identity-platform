@@ -23,7 +23,17 @@ uvicorn identity_api.main:app --reload --port 8000
 
 API health: http://localhost:8000/health
 
-More detail will land as phases complete (migrations, seed, frontends).
+### Auth (phase 02)
+
+```bash
+cd apps/api && source .venv/bin/activate
+alembic upgrade head
+uvicorn identity_api.main:app --reload --port 8000
+```
+
+- `POST /auth/register` / `POST /auth/login` / `POST /auth/logout` / `GET /auth/me`
+- `GET /me/sessions` / `POST /me/sessions/{id}/revoke`
+- CI: `.github/workflows/ci.yml` (ruff + pytest with Postgres/Redis services)
 
 ## Tooling
 
