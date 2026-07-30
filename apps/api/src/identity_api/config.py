@@ -1,10 +1,20 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # apps/api/src/identity_api/config.py → monorepo root
 _REPO_ROOT = Path(__file__).resolve().parents[4]
+
+
+def normalize_database_url(url: str) -> str:
+    """Railway/Heroku often provide postgres://; SQLAlchemy async needs asyncpg."""
+    if url.startswith("postgres://"):
+        return "postgresql+asyncpg://" + url.removeprefix("postgres://")
+    if url.startswith("postgresql://"):
+        return "postgresql+asyncpg://" + url.removeprefix("postgresql://")
+    return url
 
 
 class Settings(BaseSettings):
@@ -38,6 +48,13 @@ class Settings(BaseSettings):
     demo_client_id: str = "demo-app"
     demo_redirect_uri: str = "http://localhost:5174/callback"
     demo_client_name: str = "Fieldkit Demo"
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _asyncpg_database_url(cls, value: object) -> object:
+        if isinstance(value, str):
+            return normalize_database_url(value)
+        return value
 
     @property
     def cors_origin_list(self) -> list[str]:

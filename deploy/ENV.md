@@ -22,3 +22,5 @@
 #   COOKIE_DOMAIN=               # leave empty (host-only sid cookie)
 #   ENABLE_DEV_OAUTH_CLIENTS=false
 #   SECRET_KEY=<strong random>
+#   DATABASE_URL from Railway Postgres plugin is fine as postgres://
+#     (normalized to postgresql+asyncpg:// in Settings)
