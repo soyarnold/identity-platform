@@ -37,7 +37,9 @@ jobs:
           --health-retries 10
 
     env:
+      # Ephemeral CI DB — fine to drop_all. Local pytest uses identity_test instead.
       DATABASE_URL: postgresql+asyncpg://identity:identity@localhost:5432/identity
+      DATABASE_ADMIN_URL: postgresql+asyncpg://identity:identity@localhost:5432/postgres
       REDIS_URL: redis://localhost:6379/1
       SECRET_KEY: ci-secret
 
