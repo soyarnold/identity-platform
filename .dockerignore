@@ -1,0 +1,16 @@
+.git
+.github
+**/node_modules
+**/dist
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+infra/cdk.out
+infra/node_modules
+.env
+.env.*
+*.md
+!apps/api/README.md
+docs
+scripts
