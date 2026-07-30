@@ -34,6 +34,14 @@ npm run dev
 
 Open http://localhost:5173 — register/login, passkeys, sessions (API on `:8000`).
 
+### Hosted OAuth UI (phase 06)
+
+`GET /oauth/authorize` redirects the browser to:
+
+- `/oauth/login` (no session) or `/oauth/consent` (session present)
+- After sign-in/register → `/oauth/consent` (same authorize query preserved)
+- Allow/Deny → `POST /oauth/consent` → browser navigates to `redirect_to`
+
 ## API surface (summary)
 
 - Auth: `POST /auth/register|login|logout`, `GET /auth/me`

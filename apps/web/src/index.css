@@ -257,6 +257,20 @@ button.danger {
   padding-top: 0;
 }
 
+.break {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.scope-list {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.scope-list li {
+  margin: 0.15rem 0;
+}
+
 @media (max-width: 640px) {
   .list-item {
     flex-direction: column;
