@@ -32,3 +32,5 @@ pytest
 Auth endpoints: `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`, `GET /me/sessions`, `POST /me/sessions/{id}/revoke`.
 
 WebAuthn: `POST /webauthn/register/options|verify`, `POST /webauthn/login/options|verify`, `GET/PATCH/DELETE /me/passkeys`.
+
+OAuth (AS): `GET /oauth/authorize`, `POST /oauth/consent`, `POST /oauth/token`, `GET /oauth/userinfo`, `GET /.well-known/oauth-authorization-server`. Dev helper: `POST /oauth/dev/clients`.

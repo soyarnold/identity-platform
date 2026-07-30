@@ -34,6 +34,7 @@ uvicorn identity_api.main:app --reload --port 8000
 - `POST /auth/register` / `POST /auth/login` / `POST /auth/logout` / `GET /auth/me`
 - `GET /me/sessions` / `POST /me/sessions/{id}/revoke`
 - WebAuthn (phase 03): `POST /webauthn/register|login/options|verify`, `GET/PATCH/DELETE /me/passkeys`
+- OAuth AS (phase 04): authorize/consent/token/userinfo + PKCE; `POST /oauth/dev/clients` for local testing
 - CI: `.github/workflows/ci.yml` (ruff + pytest with Postgres/Redis services)
 
 ## Tooling
