@@ -56,6 +56,21 @@ UPDATE users SET is_admin = true WHERE email = 'you@example.com';
 
 API: `GET/PATCH /admin/users`, `GET /admin/audit-logs`, `GET/POST/PATCH/DELETE /admin/oauth/clients`.
 
+### Demo OAuth client (phase 08)
+
+```bash
+# Register client once (or use admin → Clients)
+curl -sS -X POST http://localhost:8000/oauth/dev/clients \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Fieldkit Demo","client_id":"demo-app","redirect_uris":["http://localhost:5174/callback"],"is_confidential":false}'
+
+cd apps/demo
+npm install
+npm run dev
+```
+
+Open http://localhost:5174 — **Sign in with Identity Platform** (needs API + web running).
+
 ## API surface (summary)
 
 - Auth: `POST /auth/register|login|logout`, `GET /auth/me`
