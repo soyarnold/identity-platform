@@ -15,6 +15,14 @@ Open http://localhost:5174
 
 ## Register the client (once)
 
+Prefer the monorepo seed (creates admin + this client):
+
+```bash
+./scripts/seed.sh
+```
+
+Or:
+
 ```bash
 curl -sS -X POST http://localhost:8000/oauth/dev/clients \
   -H 'Content-Type: application/json' \
@@ -22,6 +30,8 @@ curl -sS -X POST http://localhost:8000/oauth/dev/clients \
 ```
 
 Or create the same client in the admin panel (`/admin/clients`).
+
+Third-party integrators (no repo): see [`docs/oauth-clients.md`](../../docs/oauth-clients.md).
 
 ## Flow
 

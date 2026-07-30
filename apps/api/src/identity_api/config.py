@@ -1,11 +1,16 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# apps/api/src/identity_api/config.py → monorepo root
+_REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # Prefer repo-root .env; fall back to cwd (e.g. apps/api/.env)
+        env_file=(str(_REPO_ROOT / ".env"), ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -24,6 +29,13 @@ class Settings(BaseSettings):
     webauthn_origins: str = "http://localhost:5173,http://localhost:5174"
     cookie_secure: bool = False
     cookie_name: str = "sid"
+
+    # Local seed (python -m identity_api.seed) — not used by the API at runtime
+    seed_admin_email: str = "admin@example.com"
+    seed_admin_password: str = "AdminPassword123!"
+    demo_client_id: str = "demo-app"
+    demo_redirect_uri: str = "http://localhost:5174/callback"
+    demo_client_name: str = "Fieldkit Demo"
 
     @property
     def cors_origin_list(self) -> list[str]:
