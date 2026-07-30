@@ -17,6 +17,7 @@ pip install -e ".[dev]"
 # from repo root
 docker compose up -d
 cd apps/api
+alembic upgrade head
 uvicorn identity_api.main:app --reload --port 8000
 ```
 
@@ -27,3 +28,5 @@ ruff check .
 ruff format .
 pytest
 ```
+
+Auth endpoints: `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`, `GET /me/sessions`, `POST /me/sessions/{id}/revoke`.
