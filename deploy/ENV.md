@@ -12,6 +12,7 @@
 # ENABLE_DEV_OAUTH_CLIENTS=true
 
 # --- Railway single HOST (e.g. https://xxx.up.railway.app) ---
+# Networking: domain target port = 8080 ($PORT / nginx). NEVER 8000 (local uvicorn only).
 # Build args: VITE_API_URL=  (empty = same-origin)  VITE_BASE=/demo/ (Dockerfile)
 # Runtime:
 #   FRONTEND_URL=https://HOST

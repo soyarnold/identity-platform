@@ -6,16 +6,27 @@ One public HTTPS hostname serves:
 |------|-----|
 | `/` | Identity web (dashboard + hosted OAuth login/consent) |
 | `/demo/` | Fieldkit (OAuth client) |
-| `/auth`, `/oauth`, `/me`, … | FastAPI (proxied by nginx → uvicorn) |
+| `/auth`, `/oauth`, `/me`, `/health`, … | FastAPI (nginx → uvicorn unix socket) |
 
 Postgres + Redis are Railway plugins. No custom domain required for cookies: everything is same-origin, so the HttpOnly `sid` cookie works.
 
 ```text
-Browser → https://HOST
+Browser → https://HOST  (Railway public domain → TCP $PORT, usually 8080)
+            │
+            ▼
+          nginx (only public TCP listener)
             ├─ /          Identity web (static)
             ├─ /demo/     Fieldkit (static)
-            └─ /oauth/…   API (uvicorn)
+            └─ /oauth/…   proxy → unix:/tmp/uvicorn.sock (FastAPI)
 ```
+
+**Do not confuse local ports with Railway:**
+
+| Port | Local dev | Railway container |
+|------|-----------|-------------------|
+| `8000` | uvicorn directly | **Not used** (API is a unix socket) |
+| `5173` / `5174` | Vite web / demo | N/A (built into static files) |
+| `8080` (`$PORT`) | optional local Docker | **nginx — set the domain target port to this** |
 
 ## 1. Create the project
 
@@ -26,12 +37,12 @@ Browser → https://HOST
    - Repo includes [`railway.json`](../railway.json) with `"builder": "DOCKERFILE"`.
    - Or in the service **Settings → Build**: set builder to **Dockerfile**, path `Dockerfile`.
    - Root directory = monorepo root (where `Dockerfile` lives).
-5. Generate / copy the public URL — call it `https://HOST` (e.g. `https://identity-platform-production.up.railway.app`).
-6. **Networking → public port / target port must be `$PORT` (usually `8080`)**, where nginx listens. Do **not** point traffic at `8000` — the API is only on a Unix socket inside the container.
+5. Generate a public URL — call it `https://HOST` (e.g. `https://identity-platform-production.up.railway.app`).
+6. **Networking (required):** on that domain, set **Port / target port to `8080`** (or whatever `$PORT` Railway injects — must match nginx).  
+   - **Never use `8000`** for the public domain. That is the local uvicorn port only.  
+   - Symptom if wrong: deploy logs show `/health` 200, but the browser gets edge **502** for `/`, `/demo/`, and `/health`.
 
 If the build log says **Railpack** and `railpack process exited with an error`, Railway ignored the Dockerfile. Fix the builder setting above and redeploy.
-
-If deploy logs show `/health` 200 but the public URL is 502, the domain is almost always aimed at the wrong port — set the service target port to `8080` (or whatever `$PORT` is) and redeploy.
 
 ## 2. Runtime environment variables
 
@@ -54,7 +65,7 @@ Set these on the **web/API service** (not only in a local `.env`). Replace `HOST
 | `COOKIE_SECURE` | `true` |
 | `COOKIE_DOMAIN` | Leave empty |
 | `ENABLE_DEV_OAUTH_CLIENTS` | `false` |
-| `PORT` | Usually set by Railway |
+| `PORT` | Set by Railway (nginx listens here; domain target port must match) |
 
 Also set seed/demo vars if you override defaults so boot seed matches Fieldkit’s redirect URI.
 
@@ -77,23 +88,45 @@ Push the branch Railway watches (or **Deploy** from the dashboard). On each star
 
 1. `alembic upgrade head`
 2. `python -m identity_api.seed` (admin + `demo-app`)
-3. uvicorn + nginx on `$PORT`
+3. uvicorn on `unix:/tmp/uvicorn.sock` + nginx on `$PORT`
 
-Health check path: `/health`.
+Health check path: `/health` (must go through nginx on `$PORT`).
+
+Healthy deploy log markers:
+
+```text
+Starting uvicorn on unix:/tmp/uvicorn.sock...
+Starting nginx on 0.0.0.0:8080 (only public TCP port)...
+… "GET /health HTTP/1.1" 200 OK
+```
 
 ## 4. Smoke test (GIF path)
 
-1. Open `https://HOST/demo/` → **Sign in with Identity Platform**.
-2. Register or sign in on hosted UI (`/oauth/login` …).
-3. **Allow** on consent.
-4. Land on `https://HOST/demo/callback` → Fieldkit shows email / `sub`.
-5. Optional: `https://HOST/` with seed admin → dashboard / `/admin`.
+1. `https://HOST/health` → 200 (not Railway JSON 502).
+2. Open `https://HOST/demo/` → **Sign in with Identity Platform**.
+3. Register or sign in on hosted UI (`/oauth/login` …).
+4. **Allow** on consent.
+5. Land on `https://HOST/demo/callback` → Fieldkit shows email / `sub`.
+6. Optional: `https://HOST/` with seed admin → dashboard / `/admin`.
 
 If consent loops or “not authenticated”: confirm `FRONTEND_URL`, `COOKIE_SECURE=true`, and that you are not mixing `http`/`https` or a second hostname.
 
 If authorize fails with invalid redirect: update seed `DEMO_REDIRECT_URI` (or admin Clients) to exactly `https://HOST/demo/callback`, redeploy or re-run seed.
 
-## 5. Local Docker (optional)
+## 5. Troubleshooting (502 / “Application failed to respond”)
+
+| What you see | Likely cause | Fix |
+|--------------|--------------|-----|
+| Public 502; domain **Port 8000** | Edge aimed at old local uvicorn port | Set domain port to **8080** |
+| Deploy log health 200, browser 502 | Same port mismatch | Networking → port **8080** |
+| Container exits after “Starting nginx” | Old entrypoint killed uvicorn on `exec` | Use current `deploy/entrypoint.sh` (no `exec` + EXIT trap) |
+| Railpack build failure | Wrong builder | Force **Dockerfile** via `railway.json` / settings |
+| No DB / Redis | Plugins not linked | Add Postgres + Redis; reference `DATABASE_URL` / `REDIS_URL` |
+| OAuth redirect rejected | Seed still has localhost callback only | Set `DEMO_REDIRECT_URI=https://HOST/demo/callback`, redeploy |
+
+**502 during `image push` is normal** — wait until **Healthcheck succeeded** before testing the URL.
+
+## 6. Local Docker (optional)
 
 From monorepo root (Postgres/Redis already via Compose):
 
