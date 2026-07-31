@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Railway / container entrypoint: migrate → seed → API + nginx on $PORT.
-set -euo pipefail
+set -eu
 
 PORT="${PORT:-8080}"
 API_HOST="127.0.0.1"
@@ -25,18 +25,34 @@ uvicorn identity_api.main:app \
   --forwarded-allow-ips='*' &
 UVICORN_PID=$!
 
-cleanup() {
-  kill "${UVICORN_PID}" 2>/dev/null || true
-}
-trap cleanup EXIT
-
 # Wait until API accepts connections before opening nginx
-for _ in $(seq 1 60); do
+i=0
+while [ "$i" -lt 60 ]; do
   if python -c "import urllib.request; urllib.request.urlopen('http://${API_HOST}:${API_PORT}/health', timeout=1)" 2>/dev/null; then
     break
   fi
+  i=$((i + 1))
   sleep 0.5
 done
 
 echo "Starting nginx on port ${PORT}..."
-exec nginx -g 'daemon off;'
+nginx -g 'daemon off;' &
+NGINX_PID=$!
+
+shutdown() {
+  echo "Shutting down..."
+  kill -TERM "${NGINX_PID}" 2>/dev/null || true
+  kill -TERM "${UVICORN_PID}" 2>/dev/null || true
+  wait "${NGINX_PID}" 2>/dev/null || true
+  wait "${UVICORN_PID}" 2>/dev/null || true
+}
+trap 'shutdown; exit 0' TERM INT
+
+# Stay up while both children are alive (POSIX: no wait -n).
+while kill -0 "${UVICORN_PID}" 2>/dev/null && kill -0 "${NGINX_PID}" 2>/dev/null; do
+  sleep 1
+done
+
+echo "A supervised process exited."
+shutdown
+exit 1

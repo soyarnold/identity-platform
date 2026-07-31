@@ -68,7 +68,7 @@ async def seed() -> None:
                     dict.fromkeys([*(client.redirect_uris or []), redirect])
                 )
             client.name = settings.demo_client_name
-            print(f"Updated OAuth client: {client_id}")
+            print(f"Updated OAuth client: {client_id} → {client.redirect_uris}")
 
         await db.commit()
 

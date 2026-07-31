@@ -21,9 +21,14 @@ Browser → https://HOST
 
 1. In [Railway](https://railway.app), **New Project**.
 2. Add **PostgreSQL** and **Redis** plugins (same project).
-3. Add a **service** from this GitHub repo (or deploy from CLI with the root [`Dockerfile`](../Dockerfile)).
-4. Set the service **root** to the monorepo root (Dockerfile path `.`).
+3. Add a **service** from this GitHub repo (or deploy from CLI).
+4. **Builder must be Dockerfile** — this monorepo is not Railpack-friendly.
+   - Repo includes [`railway.json`](../railway.json) with `"builder": "DOCKERFILE"`.
+   - Or in the service **Settings → Build**: set builder to **Dockerfile**, path `Dockerfile`.
+   - Root directory = monorepo root (where `Dockerfile` lives).
 5. Generate / copy the public URL — call it `https://HOST` (e.g. `https://identity-platform-production.up.railway.app`).
+
+If the build log says **Railpack** and `railpack process exited with an error`, Railway ignored the Dockerfile. Fix the builder setting above and redeploy.
 
 ## 2. Runtime environment variables
 
