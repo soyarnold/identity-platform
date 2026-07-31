@@ -27,8 +27,11 @@ Browser → https://HOST
    - Or in the service **Settings → Build**: set builder to **Dockerfile**, path `Dockerfile`.
    - Root directory = monorepo root (where `Dockerfile` lives).
 5. Generate / copy the public URL — call it `https://HOST` (e.g. `https://identity-platform-production.up.railway.app`).
+6. **Networking → public port / target port must be `$PORT` (usually `8080`)**, where nginx listens. Do **not** point traffic at `8000` — the API is only on a Unix socket inside the container.
 
 If the build log says **Railpack** and `railpack process exited with an error`, Railway ignored the Dockerfile. Fix the builder setting above and redeploy.
+
+If deploy logs show `/health` 200 but the public URL is 502, the domain is almost always aimed at the wrong port — set the service target port to `8080` (or whatever `$PORT` is) and redeploy.
 
 ## 2. Runtime environment variables
 
