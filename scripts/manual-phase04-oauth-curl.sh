@@ -9,13 +9,13 @@
 # existing demo-app), generate a fresh PKCE challenge, then open authorize in a
 # browser — the API 302s to FRONTEND_URL /oauth/login or /oauth/consent:
 #
-#   http://localhost:8000/oauth/authorize?client_id=demo-app&redirect_uri=http%3A%2F%2Flocalhost%3A5174%2Fcallback&response_type=code&code_challenge=REPLACE_WITH_S256_CHALLENGE&code_challenge_method=S256&state=manual-state&scope=openid%20profile%20email
+#   http://localhost:8000/api/oauth/authorize?client_id=demo-app&redirect_uri=http%3A%2F%2Flocalhost%3A5174%2Fcallback&response_type=code&code_challenge=REPLACE_WITH_S256_CHALLENGE&code_challenge_method=S256&state=manual-state&scope=openid%20profile%20email
 #
 # Web must be running (apps/web on :5173). Callback hits :5174 (demo app, phase 08).
 
 set -euo pipefail
 
-API="${API:-http://localhost:8000}"
+API="${API:-http://localhost:8000/api}"
 JAR="${JAR:-/tmp/identity-phase04.jar}"
 EMAIL="${EMAIL:-oauth-manual@example.com}"
 PASSWORD="${PASSWORD:-password123}"

@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-API="${API:-http://localhost:8000}"
+API="${API:-http://localhost:8000/api}"
 JAR="${JAR:-/tmp/identity-phase03.jar}"
 EMAIL="${EMAIL:-manual@example.com}"
 PASSWORD="${PASSWORD:-password123}"

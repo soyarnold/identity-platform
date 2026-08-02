@@ -1,11 +1,15 @@
 /**
- * API origin for cookie-authenticated fetches.
- * Local: VITE_API_URL or http://localhost:8000.
- * Production build with empty/unset VITE_API_URL: same-origin.
+ * API origin (includes /api prefix).
+ * Local: VITE_API_URL or http://localhost:8000/api.
+ * Production / shared-host build: same-origin /api.
  */
+const _viteApi = import.meta.env.VITE_API_URL;
 const API_URL =
-  import.meta.env.VITE_API_URL ??
-  (import.meta.env.DEV ? "http://localhost:8000" : "");
+  _viteApi !== undefined && _viteApi !== ""
+    ? _viteApi
+    : import.meta.env.DEV
+      ? "http://localhost:8000/api"
+      : "/api";
 
 export class ApiError extends Error {
   status: number;

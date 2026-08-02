@@ -1,13 +1,13 @@
 /**
  * Fieldkit OAuth config.
- * Local (base `/`): API at VITE_API_URL or http://localhost:8000.
- * Shared host (base `/demo/`): same-origin relative `/oauth/...` paths.
+ * Local: API at VITE_API_URL or http://localhost:8000/api.
+ * Shared host (base `/demo/`): same-origin /api.
  */
 const sharedHost = import.meta.env.BASE_URL !== "/";
 
 const API_URL = sharedHost
-  ? ""
-  : import.meta.env.VITE_API_URL || "http://localhost:8000";
+  ? "/api"
+  : import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 function redirectUri(): string {
   if (sharedHost) {

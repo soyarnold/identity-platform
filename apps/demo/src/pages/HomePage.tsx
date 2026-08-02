@@ -74,7 +74,7 @@ export function HomePage() {
         Needs API + hosted Identity UI (local :8000 / :5173, or same host in
         production) and OAuth client <code>{config.clientId}</code> with redirect{" "}
         <code>{config.redirectUri}</code>. Create via seed, admin Clients, or{" "}
-        <code>POST /oauth/dev/clients</code>.{" "}
+        <code>POST /api/oauth/dev/clients</code>.{" "}
         <Link to="/callback">Callback</Link> handles the code exchange.
       </p>
     </section>

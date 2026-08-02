@@ -32,12 +32,12 @@ ruff format .
 pytest
 ```
 
-Auth endpoints: `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`, `GET /me/sessions`, `POST /me/sessions/{id}/revoke`.
+Auth endpoints: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`, `GET /api/me/sessions`, `POST /api/me/sessions/{id}/revoke`.
 
-WebAuthn: `POST /webauthn/register/options|verify`, `POST /webauthn/login/options|verify`, `GET/PATCH/DELETE /me/passkeys`.
+WebAuthn: `POST /api/webauthn/register/options|verify`, `POST /api/webauthn/login/options|verify`, `GET/PATCH/DELETE /api/me/passkeys`.
 
-OAuth (AS): `GET /oauth/authorize`, `POST /oauth/consent`, `POST /oauth/token`, `GET /oauth/userinfo`, `GET /.well-known/oauth-authorization-server`. Dev helper: `POST /oauth/dev/clients` (requires `ENABLE_DEV_OAUTH_CLIENTS=true`).
+OAuth (AS): `GET /api/oauth/authorize`, `POST /api/oauth/consent`, `POST /api/oauth/token`, `GET /api/oauth/userinfo`, `GET /api/.well-known/oauth-authorization-server`. Dev helper: `POST /api/oauth/dev/clients` (requires `ENABLE_DEV_OAUTH_CLIENTS=true`).
 
-Admin (requires `is_admin`): `GET/PATCH /admin/users`, `GET /admin/audit-logs`, `GET/POST/PATCH/DELETE /admin/oauth/clients`.
+Admin (requires `is_admin`): `GET/PATCH /api/admin/users`, `GET /api/admin/audit-logs`, `GET/POST/PATCH/DELETE /api/admin/oauth/clients`.
 
 Third-party OAuth client integration (no repo required): see `/docs/oauth-clients.md` at the monorepo root.

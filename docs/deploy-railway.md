@@ -4,15 +4,15 @@ One HTTPS host:
 
 | Path | Serves |
 |------|--------|
-| `/` | Identity web |
-| `/demo/` | Fieldkit |
-| `/auth`, `/oauth`, `/me`, `/health`, … | API (nginx → uvicorn) |
+| `/` | Identity web (SPA) |
+| `/demo/` | Fieldkit (SPA) |
+| `/api/*` | FastAPI |
 
 ```text
 Browser → HOST:$PORT (usually 8080)
             └─ nginx
+                 ├─ /api/*   → unix socket → FastAPI
                  ├─ /demo/*  → static Fieldkit
-                 ├─ /oauth/* → unix socket → FastAPI
                  └─ /*       → static Identity web
 ```
 
@@ -30,7 +30,7 @@ Healthy logs include: `Uvicorn running on unix socket` and `Starting nginx on 0.
 
 ## Smoke test
 
-1. `https://HOST/health` → 200  
+1. `https://HOST/api/health` → 200  
 2. `https://HOST/demo/` → Sign in → consent → `/demo/callback`  
 3. Optional: `https://HOST/` with seed admin  
 

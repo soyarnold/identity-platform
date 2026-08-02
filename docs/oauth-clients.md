@@ -20,7 +20,7 @@ You never receive database access, admin credentials, or this monorepo.
 GET {ISSUER}/.well-known/oauth-authorization-server
 ```
 
-Local issuer: `http://localhost:8000`
+Local issuer: `http://localhost:8000/api`
 
 Response includes `authorization_endpoint`, `token_endpoint`, `userinfo_endpoint`, and `code_challenge_methods_supported` (`S256`).
 

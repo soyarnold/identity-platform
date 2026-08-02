@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from identity_api.config import settings
 from identity_api.redis_client import close_redis
 from identity_api.routers import admin, auth, health, me, oauth, passkeys, webauthn
+
+API_PREFIX = "/api"
 
 
 @asynccontextmanager
@@ -32,13 +34,17 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.include_router(health.router)
-    app.include_router(auth.router)
-    app.include_router(me.router)
-    app.include_router(passkeys.router)
-    app.include_router(webauthn.router)
-    app.include_router(oauth.router)
-    app.include_router(admin.router)
+    # All JSON/API routes live under /api so same-origin nginx can proxy
+    # /api/* without colliding with SPA routes (/oauth/login, /admin/users, …).
+    api = APIRouter(prefix=API_PREFIX)
+    api.include_router(health.router)
+    api.include_router(auth.router)
+    api.include_router(me.router)
+    api.include_router(passkeys.router)
+    api.include_router(webauthn.router)
+    api.include_router(oauth.router)
+    api.include_router(admin.router)
+    app.include_router(api)
     return app
 
 

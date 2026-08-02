@@ -95,12 +95,14 @@ async def _require_valid_authorize_params(
 async def authorization_server_metadata(request: Request) -> dict:
     # RFC 8414-style discovery document so clients can find authorize/token/userinfo
     # endpoints and supported grant / PKCE methods without hard-coding URLs.
-    base = str(request.base_url).rstrip("/")
+    # API is mounted at /api (see main.API_PREFIX).
+    origin = str(request.base_url).rstrip("/")
+    api_base = f"{origin}/api"
     return {
-        "issuer": base,
-        "authorization_endpoint": f"{base}/oauth/authorize",
-        "token_endpoint": f"{base}/oauth/token",
-        "userinfo_endpoint": f"{base}/oauth/userinfo",
+        "issuer": api_base,
+        "authorization_endpoint": f"{api_base}/oauth/authorize",
+        "token_endpoint": f"{api_base}/oauth/token",
+        "userinfo_endpoint": f"{api_base}/oauth/userinfo",
         "response_types_supported": ["code"],
         "grant_types_supported": ["authorization_code", "refresh_token"],
         "code_challenge_methods_supported": ["S256"],
@@ -398,11 +400,11 @@ async def create_dev_client(
 # URL flow — third-party client sign-in via this authorization server (PKCE)
 #
 # Example client: demo app at http://localhost:5174 (client_id=demo-app)
-# Identity web UI: http://localhost:5173  |  API: http://localhost:8000
+# Identity web UI: http://localhost:5173  |  API: http://localhost:8000/api
 #
 # 1) User clicks "Sign in" on the client app.
 #    Client generates code_verifier / code_challenge (S256) and redirects browser:
-#      GET http://localhost:8000/oauth/authorize
+#      GET http://localhost:8000/api/oauth/authorize
 #          ?client_id=demo-app
 #          &redirect_uri=http://localhost:5174/callback
 #          &response_type=code
@@ -411,28 +413,28 @@ async def create_dev_client(
 #          &state=<csrf>
 #          &scope=openid%20profile%20email
 #
-# 2) /oauth/authorize validates client + PKCE, then 302s:
+# 2) /api/oauth/authorize validates client + PKCE, then 302s:
 #    - No sid cookie → hosted login (preserve query string):
 #        http://localhost:5173/oauth/login?<same authorize params>
 #    - Has sid cookie → hosted consent:
 #        http://localhost:5173/oauth/consent?<same authorize params>
 #
 # 3) If login was required, user signs in/registers on the hosted UI (session
-#    cookie set via /auth/*). SPA then navigates to /oauth/consent with params.
+#    cookie set via /api/auth/*). SPA then navigates to /oauth/consent with params.
 #
-# 4) User approves on consent UI → SPA POST /oauth/consent (cookie auth) →
+# 4) User approves on consent UI → SPA POST /api/oauth/consent (cookie auth) →
 #    API returns JSON { redirect_to:
 #      "http://localhost:5174/callback?code=...&state=..." }
 #    SPA performs location redirect to that URL.
 #
 # 5) Client app callback exchanges the code (server-side or public PKCE):
-#      POST http://localhost:8000/oauth/token
+#      POST http://localhost:8000/api/oauth/token
 #          grant_type=authorization_code
 #          code=...&redirect_uri=...&client_id=demo-app&code_verifier=...
 #    → access_token (+ refresh_token)
 #
 # 6) Client calls:
-#      GET http://localhost:8000/oauth/userinfo
+#      GET http://localhost:8000/api/oauth/userinfo
 #          Authorization: Bearer <access_token>
 #    → { sub, email, ... }
 #

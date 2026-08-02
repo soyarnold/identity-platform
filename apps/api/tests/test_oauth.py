@@ -17,11 +17,11 @@ def _pkce_pair() -> tuple[str, str]:
 @pytest.mark.asyncio
 async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
     await client.post(
-        "/auth/register",
+        "/api/auth/register",
         json={"email": "oauth@example.com", "password": "password123"},
     )
     created = await client.post(
-        "/oauth/dev/clients",
+        "/api/oauth/dev/clients",
         json={
             "name": "Demo",
             "client_id": "demo-app",
@@ -36,7 +36,7 @@ async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
 
     # Unauthenticated authorize → hosted login redirect
     anon = await client.get(
-        "/oauth/authorize",
+        "/api/oauth/authorize",
         params={
             "client_id": "demo-app",
             "redirect_uri": "http://localhost:5174/callback",
@@ -49,9 +49,9 @@ async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
         follow_redirects=False,
     )
     # client still has sid from register — logout first for this assert
-    await client.post("/auth/logout")
+    await client.post("/api/auth/logout")
     anon = await client.get(
-        "/oauth/authorize",
+        "/api/oauth/authorize",
         params={
             "client_id": "demo-app",
             "redirect_uri": "http://localhost:5174/callback",
@@ -66,11 +66,11 @@ async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
     assert "/oauth/login" in anon.headers["location"]
 
     await client.post(
-        "/auth/login",
+        "/api/auth/login",
         json={"email": "oauth@example.com", "password": "password123"},
     )
     authed = await client.get(
-        "/oauth/authorize",
+        "/api/oauth/authorize",
         params={
             "client_id": "demo-app",
             "redirect_uri": "http://localhost:5174/callback",
@@ -85,7 +85,7 @@ async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
     assert "/oauth/consent" in authed.headers["location"]
 
     consent = await client.post(
-        "/oauth/consent",
+        "/api/oauth/consent",
         json={
             "client_id": "demo-app",
             "redirect_uri": "http://localhost:5174/callback",
@@ -105,7 +105,7 @@ async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
     code = qs["code"][0]
 
     token = await client.post(
-        "/oauth/token",
+        "/api/oauth/token",
         data={
             "grant_type": "authorization_code",
             "code": code,
@@ -121,14 +121,14 @@ async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
     assert "refresh_token" in body
 
     info = await client.get(
-        "/oauth/userinfo",
+        "/api/oauth/userinfo",
         headers={"Authorization": f"Bearer {body['access_token']}"},
     )
     assert info.status_code == 200
     assert info.json()["email"] == "oauth@example.com"
 
     refreshed = await client.post(
-        "/oauth/token",
+        "/api/oauth/token",
         data={
             "grant_type": "refresh_token",
             "refresh_token": body["refresh_token"],
@@ -142,11 +142,11 @@ async def test_oauth_pkce_happy_path(client: AsyncClient) -> None:
 @pytest.mark.asyncio
 async def test_oauth_rejects_bad_pkce(client: AsyncClient) -> None:
     await client.post(
-        "/auth/register",
+        "/api/auth/register",
         json={"email": "pkce@example.com", "password": "password123"},
     )
     await client.post(
-        "/oauth/dev/clients",
+        "/api/oauth/dev/clients",
         json={
             "name": "Demo2",
             "client_id": "demo-2",
@@ -155,7 +155,7 @@ async def test_oauth_rejects_bad_pkce(client: AsyncClient) -> None:
     )
     _verifier, challenge = _pkce_pair()
     consent = await client.post(
-        "/oauth/consent",
+        "/api/oauth/consent",
         json={
             "client_id": "demo-2",
             "redirect_uri": "http://localhost:5174/callback",
@@ -166,7 +166,7 @@ async def test_oauth_rejects_bad_pkce(client: AsyncClient) -> None:
     )
     code = parse_qs(urlparse(consent.json()["redirect_to"]).query)["code"][0]
     bad = await client.post(
-        "/oauth/token",
+        "/api/oauth/token",
         data={
             "grant_type": "authorization_code",
             "code": code,
@@ -180,9 +180,9 @@ async def test_oauth_rejects_bad_pkce(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 async def test_discovery(client: AsyncClient) -> None:
-    response = await client.get("/.well-known/oauth-authorization-server")
+    response = await client.get("/api/.well-known/oauth-authorization-server")
     assert response.status_code == 200
-    assert response.json()["authorization_endpoint"].endswith("/oauth/authorize")
+    assert response.json()["authorization_endpoint"].endswith("/api/oauth/authorize")
 
 
 @pytest.mark.asyncio
@@ -193,7 +193,7 @@ async def test_dev_clients_disabled(client: AsyncClient, monkeypatch) -> None:
     get_settings.cache_clear()
     try:
         res = await client.post(
-            "/oauth/dev/clients",
+            "/api/oauth/dev/clients",
             json={
                 "name": "Nope",
                 "client_id": "should-404",

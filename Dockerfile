@@ -10,7 +10,7 @@ WORKDIR /src
 COPY apps/web/package.json apps/web/package-lock.json ./
 RUN npm ci
 COPY apps/web/ ./
-# Same-origin API paths. Clear VITE_API_URL so Railway service env cannot bake localhost.
+# Clear VITE_API_URL so Railway cannot bake localhost; app defaults to /api.
 RUN VITE_API_URL= npm run build
 
 # ---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ COPY apps/demo/package.json apps/demo/package-lock.json ./
 RUN npm ci
 COPY apps/demo/ ./
 ARG VITE_DEMO_CLIENT_ID=demo-app
-# base=/demo/ → sharedHost config; empty VITE_API_URL → /oauth/... on same host.
+# base=/demo/ → shared-host; empty VITE_API_URL → same-origin /api.
 RUN VITE_API_URL= \
     VITE_BASE=/demo/ \
     VITE_DEMO_CLIENT_ID=$VITE_DEMO_CLIENT_ID \

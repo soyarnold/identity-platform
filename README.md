@@ -60,18 +60,20 @@ Re-run seed anytime (idempotent): `./scripts/seed.sh`
 ### Product surfaces (after seed)
 
 - **Dashboard** (`:5173`) — register/login, passkeys, sessions; admin nav if `is_admin`
-- **Hosted OAuth** — `/oauth/login`, `/oauth/register`, `/oauth/consent` (linked from `GET /oauth/authorize`)
-- **Admin** — `/admin/users`, `/admin/audit`, `/admin/clients`
+- **Hosted OAuth** — `/oauth/login`, `/oauth/register`, `/oauth/consent` (linked from `GET /api/oauth/authorize`)
+- **Admin UI** — `/admin/users`, `/admin/audit`, `/admin/clients`
 - **Fieldkit** (`:5174`) — public PKCE client against this AS
 
 ## API surface (summary)
 
-- Auth: `POST /auth/register|login|logout`, `GET /auth/me`
-- Sessions: `GET /me/sessions`, `POST /me/sessions/{id}/revoke`
-- WebAuthn: `POST /webauthn/register|login/options|verify`, passkey CRUD under `/me/passkeys`
-- OAuth AS: authorize / consent / token / userinfo + PKCE; discovery at `/.well-known/oauth-authorization-server`
-- Admin: `/admin/users`, `/admin/audit-logs`, `/admin/oauth/clients` (requires `is_admin`)
-- Dev helper: `POST /oauth/dev/clients` (local only when `ENABLE_DEV_OAUTH_CLIENTS=true`; prefer admin or seed)
+All JSON routes are under `/api` (SPA keeps `/oauth/login`, `/admin/users`, etc.).
+
+- Auth: `POST /api/auth/register|login|logout`, `GET /api/auth/me`
+- Sessions: `GET /api/me/sessions`, `POST /api/me/sessions/{id}/revoke`
+- WebAuthn: `POST /api/webauthn/register|login/options|verify`, passkey CRUD under `/api/me/passkeys`
+- OAuth AS: authorize / consent / token / userinfo + PKCE; discovery at `/api/.well-known/oauth-authorization-server`
+- Admin: `/api/admin/users`, `/api/admin/audit-logs`, `/api/admin/oauth/clients` (requires `is_admin`)
+- Dev helper: `POST /api/oauth/dev/clients` (local only when `ENABLE_DEV_OAUTH_CLIENTS=true`; prefer admin or seed)
 
 ## CI / PRs
 

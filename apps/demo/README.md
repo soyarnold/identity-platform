@@ -24,7 +24,7 @@ Prefer the monorepo seed (creates admin + this client):
 Or:
 
 ```bash
-curl -sS -X POST http://localhost:8000/oauth/dev/clients \
+curl -sS -X POST http://localhost:8000/api/oauth/dev/clients \
   -H 'Content-Type: application/json' \
   -d '{"name":"Fieldkit Demo","client_id":"demo-app","redirect_uris":["http://localhost:5174/callback"],"is_confidential":false}'
 ```
@@ -36,9 +36,9 @@ Third-party integrators (no repo): see [`docs/oauth-clients.md`](../../docs/oaut
 ## Flow
 
 1. Click **Sign in with Identity Platform**
-2. Browser → `GET /oauth/authorize` → hosted login/consent on `:5173`
+2. Browser → `GET /api/oauth/authorize` → hosted login/consent on `:5173`
 3. Redirect to `/callback?code=&state=`
-4. Demo exchanges code at `POST /oauth/token` and loads `GET /oauth/userinfo`
+4. Demo exchanges code at `POST /api/oauth/token` and loads `GET /api/oauth/userinfo`
 
 Local env: `VITE_API_URL`, `VITE_DEMO_CLIENT_ID`, `VITE_DEMO_REDIRECT_URI` (see root `.env.example`).
 Shared-host Docker sets `VITE_BASE=/demo/` and empty `VITE_API_URL`.

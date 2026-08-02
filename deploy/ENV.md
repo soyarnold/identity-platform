@@ -1,14 +1,14 @@
 # Local vs Railway env (cheat sheet). Full steps: docs/deploy-railway.md
 
 # --- Local (Compose + Vite on :5173 / :5174) ---
-# VITE_API_URL=http://localhost:8000
+# VITE_API_URL=http://localhost:8000/api
 # FRONTEND_URL=http://localhost:5173
 # DEMO_REDIRECT_URI=http://localhost:5174/callback
 # WEBAUTHN_RP_ID=localhost
 # COOKIE_SECURE=false
 # ENABLE_DEV_OAUTH_CLIENTS=true
 
-# --- Railway (one HOST; Dockerfile sets VITE_BASE=/demo/ + empty VITE_API_URL) ---
+# --- Railway (one HOST; Dockerfile: VITE_BASE=/demo/, frontends use /api) ---
 # Networking: domain port = 8080 ($PORT). Never 8000.
 # Do not set any VITE_* on the service.
 #   DATABASE_URL / REDIS_URL   (plugins)
