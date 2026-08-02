@@ -50,9 +50,14 @@ export function HomePage() {
         </dl>
         <div className="row" style={{ marginTop: "1.25rem" }}>
           <button type="button" className="secondary" onClick={onSignOut}>
-            Sign out
+            Sign out of Fieldkit
           </button>
         </div>
+        <p className="hint" style={{ marginTop: "0.75rem" }}>
+          This only clears Fieldkit tokens. Your Identity Platform session may
+          still be active — Sign in again can skip the password form (SSO).
+          Log out from the Identity dashboard to end that session.
+        </p>
       </section>
     );
   }

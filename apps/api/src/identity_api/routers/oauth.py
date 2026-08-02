@@ -31,6 +31,7 @@ from identity_api.schemas import (
 )
 from identity_api.security import hash_password, verify_password
 from identity_api.services import oauth as oauth_service
+from identity_api.services import sessions as session_service
 from identity_api.services.audit import write_audit
 
 router = APIRouter(tags=["oauth"])
@@ -134,15 +135,19 @@ async def authorize(
         code_challenge=code_challenge,
         code_challenge_method=code_challenge_method,
     )
-    # Presence of sid cookie only — full session check happens at consent.
+    # Require a live session (not merely a leftover sid cookie). Stale cookies
+    # after logout must send the user back to hosted login.
     token = request.cookies.get(settings.cookie_name)
-    if not token:
-        return RedirectResponse(
-            url=_frontend_login_url(request),
-            status_code=status.HTTP_302_FOUND,
-        )
+    if token:
+        redis = get_redis()
+        session_user = await session_service.get_user_for_token(db, redis, token)
+        if session_user is not None:
+            return RedirectResponse(
+                url=_frontend_consent_url(request),
+                status_code=status.HTTP_302_FOUND,
+            )
     return RedirectResponse(
-        url=_frontend_consent_url(request),
+        url=_frontend_login_url(request),
         status_code=status.HTTP_302_FOUND,
     )
 
