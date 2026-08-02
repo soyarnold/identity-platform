@@ -10,10 +10,8 @@ WORKDIR /src
 COPY apps/web/package.json apps/web/package-lock.json ./
 RUN npm ci
 COPY apps/web/ ./
-# Empty VITE_API_URL → same-origin relative fetches (wired in a later todo if needed)
-ARG VITE_API_URL=
-ENV VITE_API_URL=$VITE_API_URL
-RUN npm run build
+# Same-origin API paths. Clear VITE_API_URL so Railway service env cannot bake localhost.
+RUN VITE_API_URL= npm run build
 
 # ---------------------------------------------------------------------------
 # Fieldkit (apps/demo) under /demo/
@@ -23,14 +21,12 @@ WORKDIR /src
 COPY apps/demo/package.json apps/demo/package-lock.json ./
 RUN npm ci
 COPY apps/demo/ ./
-ARG VITE_API_URL=
-ARG VITE_DEMO_REDIRECT_URI=
 ARG VITE_DEMO_CLIENT_ID=demo-app
-ENV VITE_API_URL=$VITE_API_URL \
-    VITE_DEMO_REDIRECT_URI=$VITE_DEMO_REDIRECT_URI \
+# base=/demo/ → sharedHost config; empty VITE_API_URL → /oauth/... on same host.
+RUN VITE_API_URL= \
+    VITE_BASE=/demo/ \
     VITE_DEMO_CLIENT_ID=$VITE_DEMO_CLIENT_ID \
-    VITE_BASE=/demo/
-RUN npm run build
+    npm run build
 
 # ---------------------------------------------------------------------------
 # Python API deps

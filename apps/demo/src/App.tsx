@@ -2,7 +2,6 @@ import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { CallbackPage } from "./pages/CallbackPage";
 import { HomePage } from "./pages/HomePage";
 
-// Vite BASE_URL is "/" locally or "/demo/" when built for the shared Railway host.
 const basename =
   import.meta.env.BASE_URL === "/"
     ? undefined

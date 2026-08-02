@@ -1,12 +1,11 @@
 /**
  * API origin for cookie-authenticated fetches.
- * - Local default: http://localhost:8000
- * - Railway (same host): set VITE_API_URL="" at build → "/auth/...", "/oauth/..."
+ * Local: VITE_API_URL or http://localhost:8000.
+ * Production build with empty/unset VITE_API_URL: same-origin.
  */
 const API_URL =
-  import.meta.env.VITE_API_URL !== undefined
-    ? import.meta.env.VITE_API_URL
-    : "http://localhost:8000";
+  import.meta.env.VITE_API_URL ??
+  (import.meta.env.DEV ? "http://localhost:8000" : "");
 
 export class ApiError extends Error {
   status: number;

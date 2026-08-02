@@ -40,4 +40,5 @@ Third-party integrators (no repo): see [`docs/oauth-clients.md`](../../docs/oaut
 3. Redirect to `/callback?code=&state=`
 4. Demo exchanges code at `POST /oauth/token` and loads `GET /oauth/userinfo`
 
-Env defaults match `.env.example` (`VITE_DEMO_CLIENT_ID`, `VITE_API_URL`, …).
+Local env: `VITE_API_URL`, `VITE_DEMO_CLIENT_ID`, `VITE_DEMO_REDIRECT_URI` (see root `.env.example`).
+Shared-host Docker sets `VITE_BASE=/demo/` and empty `VITE_API_URL`.
